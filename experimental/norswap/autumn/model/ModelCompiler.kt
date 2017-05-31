@@ -321,7 +321,6 @@ val model_compiler = Poly1 <ParserBuilder, String>().apply {
 
     on <BuildBuilder> {
         val backlog = if (it.backlog == 0) "" else "${it.backlog}, "
-        println("" + it.backlog + " " + it.effect)
         if (top_level)
             "build($backlog\n" +
             "        syntax = { ${digest(it.child)} },\n" +
