@@ -31,7 +31,7 @@ class Chars: EmptyGrammarFixture()
 
     @Test fun chars()
     {
-        top_fun { g.alpha() }
+        top_fun { alpha() }
         success("a")
         success("A")
         char_failure("1")

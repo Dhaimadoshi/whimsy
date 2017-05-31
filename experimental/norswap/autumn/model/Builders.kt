@@ -1,5 +1,5 @@
 package norswap.autumn.model
-import norswap.autumn.Grammar
+import norswap.lang.java8.Java8Model
 import norswap.utils.Visitable
 
 // -------------------------------------------------------------------------------------------------

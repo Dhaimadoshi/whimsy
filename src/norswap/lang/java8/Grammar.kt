@@ -6,7 +6,7 @@ import norswap.lang.java8.ast.*
 import norswap.lang.java8.ast.TypeDeclKind.*
 
 class Java8Grammar : TokenGrammar()
-{
+    {
     /// LEXICAL ====================================================================================
 
     // Whitespace

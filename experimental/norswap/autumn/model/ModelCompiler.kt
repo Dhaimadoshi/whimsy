@@ -30,7 +30,7 @@ var top_level = true
  */
 val overrides = listOf("whitespace", "root")
 
-// ----------------------------------------------------`---------------------------------------------
+// --------------------------------------------------------------------------------------------------
 
 /**
  * List of Kotlin keywords, that have to be escaped with backquotes if used as parser names.
@@ -320,7 +320,6 @@ val model_compiler = Poly1 <ParserBuilder, String>().apply {
     }
 
     on <BuildBuilder> {
-        // TODO ERROR WITH BACK LOG with assign
         val backlog = if (it.backlog == 0) "" else "${it.backlog}, "
         println("" + it.backlog + " " + it.effect)
         if (top_level)
