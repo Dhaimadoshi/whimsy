@@ -1,7 +1,7 @@
 package norswap.lang.java8.benchmark
 import norswap.autumn.CaughtException
 import norswap.autumn.UncaughtException
-//import norswap.lang.java8.Grammar2
+import norswap.lang.java8.Grammar2
 import norswap.lang.java8.Java8Grammar
 import norswap.utils.glob
 import norswap.utils.read_file
@@ -14,8 +14,8 @@ import kotlin.system.measureNanoTime
 
 fun main (args: Array<String>)
 {
-    val g = Java8Grammar()
-//    val g = Grammar2()
+//    val g = Java8Grammar()
+    val g = Grammar2()
 
     val os = System.getProperty("os.name")
 
