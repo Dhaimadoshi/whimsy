@@ -1,5 +1,6 @@
 package norswap.autumn.naive
 
+import norswap.autumn.Grammar
 import norswap.autumn.parsers.*
 
 // -------------------------------------------------------------------------------------------------
@@ -13,8 +14,9 @@ This file contains parsers that match bracketed content and comma-separated cont
 /**
  * Matches [p] bracketed by [left] and [right]. Both brackets are [word]s.
  */
-class Brackets (val left: String, val right: String, val p: Parser): Parser()
+class Brackets (g: Grammar, val left: String, val right: String, val p: Parser): Parser()
 {
+    init { grammar = g }
     override fun invoke() = grammar.brackets(left, right, p)
 }
 
@@ -23,8 +25,9 @@ class Brackets (val left: String, val right: String, val p: Parser): Parser()
 /**
  * Matches [p] bracketed by angle brackets. Uses [word] for matching the brackets.
  */
-class Angles (val p: Parser): Parser()
+class Angles (g: Grammar, val p: Parser): Parser()
 {
+    init { grammar = g }
     override fun invoke() = grammar.angles(p)
 }
 
@@ -33,8 +36,9 @@ class Angles (val p: Parser): Parser()
 /**
  * Matches an empty set of angles brackets, potentially separated and/or followed by whitespace.
  */
-class AnglesEmpty: Parser()
+class AnglesEmpty(g: Grammar): Parser()
 {
+    init { grammar = g }
     override fun invoke() = grammar.angles()
 }
 
@@ -43,8 +47,9 @@ class AnglesEmpty: Parser()
 /**
  * Matches [p] bracketed by square brackets. Uses [word] for matching the brackets.
  */
-class Squares (val p: Parser): Parser()
+class Squares (g: Grammar, val p: Parser): Parser()
 {
+    init { grammar = g }
     override fun invoke() = grammar.squares(p)
 }
 
@@ -53,8 +58,9 @@ class Squares (val p: Parser): Parser()
 /**
  * Matches an empty set of square brackets, potentially separated and/or followed by whitespace.
  */
-class SquaresEmpty: Parser()
+class SquaresEmpty(g: Grammar): Parser()
 {
+    init { grammar = g }
     override fun invoke() = grammar.squares()
 }
 
@@ -63,8 +69,9 @@ class SquaresEmpty: Parser()
 /**
  * Matches [p] bracketed by curly brackets. Uses [word] for matching the brackets.
  */
-class Curlies (val p: Parser): Parser()
+class Curlies (g: Grammar, val p: Parser): Parser()
 {
+    init { grammar = g }
     override fun invoke() = grammar.curlies(p)
 }
 
@@ -83,8 +90,9 @@ class CurliesEmpty: Parser()
 /**
  * Matches [p] bracketed by parens. Uses [word] for matching the parens.
  */
-class Parens (val p: Parser): Parser()
+class Parens (g: Grammar, val p: Parser): Parser()
 {
+    init { grammar = g }
     override fun invoke() = grammar.parens(p)
 }
 
@@ -93,8 +101,9 @@ class Parens (val p: Parser): Parser()
 /**
  * Matches an empty set of parens, potentially separated and/or followed by whitespace.
  */
-class ParensEmpty: Parser()
+class ParensEmpty(g: Grammar): Parser()
 {
+    init { grammar = g }
     override fun invoke() = grammar.parens()
 }
 
@@ -103,8 +112,9 @@ class ParensEmpty: Parser()
 /**
  * Matches a possibly-empty comma-separated list of [item]. Uses [word] to match the commas.
  */
-class CommaList0 (val item: Parser): Parser()
+class CommaList0 (g: Grammar, val item: Parser): Parser()
 {
+    init { grammar = g }
     override fun invoke() = grammar.comma_list0(item)
 }
 
@@ -113,8 +123,9 @@ class CommaList0 (val item: Parser): Parser()
 /**
  * Matches a non-empty comma-separated list of [item]. Uses [word] to match the commas.
  */
-class CommaList1 (val item: Parser): Parser()
+class CommaList1 (g: Grammar, val item: Parser): Parser()
 {
+    init { grammar = g }
     override fun invoke() = grammar.comma_list1(item)
 }
 
@@ -124,8 +135,9 @@ class CommaList1 (val item: Parser): Parser()
  * Matches a possibly-empty comma-separated list of [item]. Uses [word] to match the commas.
  * An additional comma is allowed at the end.
  */
-class CommaListTerm0 (val item: Parser): Parser()
+class CommaListTerm0 (g: Grammar, val item: Parser): Parser()
 {
+    init { grammar = g }
     override fun invoke() = grammar.comma_list_term0(item)
 }
 
@@ -135,8 +147,9 @@ class CommaListTerm0 (val item: Parser): Parser()
  * Matches a non-empty comma-separated list of [item]. Uses [word] to match the commas.
  * An additional comma is allowed at the end.
  */
-class CommaListTerm1 (val item: Parser): Parser()
+class CommaListTerm1 (g: Grammar, val item: Parser): Parser()
 {
+    init { grammar = g }
     override fun invoke() = grammar.comma_list1(item)
 }
 

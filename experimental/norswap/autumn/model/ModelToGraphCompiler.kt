@@ -1,6 +1,5 @@
 package norswap.autumn.model
 
-import norswap.autumn.naive.Token
 import norswap.lang.java8.Java8Model
 import norswap.lang.java_base.escape
 import norswap.utils.camel_to_snake
@@ -8,10 +7,7 @@ import norswap.utils.plusAssign
 import norswap.utils.poly.Poly1
 import norswap.utils.snake_to_camel
 import norswap.utils.supers
-import java.io.File
 import java.io.PrintWriter
-import kotlin.reflect.jvm.javaMethod
-import kotlin.reflect.jvm.reflect
 
 
 // -------------------------------------------------------------------------------------------------
@@ -43,8 +39,8 @@ fun compile_model_to_graph (klass_name: String, model: Any): String
     b += "import norswap.autumn.model.keyword\n"
     b += "import norswap.autumn.model.token\n"
     b += "import norswap.autumn.naive.*\n"
-    b += "import norswap.autumn.naive.Kword\n"
-    b += "import norswap.autumn.naive.Not\n"
+    b += "import norswap.autumn.naive.AssocLeft\n"
+    b += "import norswap.autumn.naive.NotAhead\n"
     b += "import norswap.lang.java_base.*\n"
     b += "import norswap.lang.java8.ast.*\n"
     b += "import norswap.lang.java8.ast.TypeDeclKind.*\n\n"
@@ -60,6 +56,7 @@ fun compile_model_to_graph (klass_name: String, model: Any): String
         b += compile_graph_top_level(it)
     }
 
+    b += "\n\n    override fun root() = root.invoke()"
     b += "\n}"
     return b.toString()
 }
@@ -83,8 +80,9 @@ fun String.escape(): String
 fun Poly1<ParserBuilder, String>.digesto(p: ParserBuilder): String
 {
     top_level = false
-    val func = if (!val_parsers.contains(p::class.java)) "()" else ""
-    return p.name ?. let { "$it$func" } ?: invoke(p)
+//    val func = if (!val_parsers.contains(p::class.java)) "()" else ""
+//    return p.name ?. let { "$it$func" } ?: invoke(p)
+    return p.name ?: invoke(p)
 }
 
 val compile_graph_top_level = Poly1<Builder, String>().apply {
@@ -111,26 +109,26 @@ val compile_graph_top_level = Poly1<Builder, String>().apply {
 
     on <ParserBuilder> {
         top_level = true
-        val func = !val_parsers.contains(it::class.java)
+//        val func = !val_parsers.contains(it::class.java)
         val str = model_graph_compiler(it)
         val b = StringBuilder()
         b += "    "
 
-        if (overrides.contains(it.name))
-            b += "override "
+//        if (overrides.contains(it.name))
+//            b += "override "
 
-        if (func)   b += "fun ${it.name}()"
-        else        b += "val ${it.name}"
-//        b += "val ${it.name}"
+//        if (func)   b += "fun ${it.name}()"
+//        else        b += "val ${it.name}"
+        b += "val ${it.name}"
 
         if (it.attributes.contains(TypeHint)) b += " : Parser"
 
-        if (equal_same_line.contains(it::class.java))
+//        if (equal_same_line.contains(it::class.java))
             b += " = $str"
-        else
-            b += "\n        = $str"
+//        else
+//            b += "\n        = $str"
 
-        b += "()"
+//        b += "()"
 
         b.toString()
     }
@@ -142,9 +140,9 @@ val model_graph_compiler = Poly1 <ParserBuilder, String>().apply {
     // TODO : ref to class or ref to val ?
     on <ReferenceBuilder> {
         if (named_rule.contains(it.str))
-            it.str.camel_to_snake() + "()"
+            it.str.camel_to_snake()
         else
-            it.str.snake_to_camel() + "()"
+            it.str.snake_to_camel() + "(this)"
     }
 
     on <ParserCodeBuilder> {
@@ -152,11 +150,11 @@ val model_graph_compiler = Poly1 <ParserBuilder, String>().apply {
     }
 
     on <StrBuilder> {
-        "Str(\"${it.str.escape()}\")"
+        "Str(this, \"${it.str.escape()}\")"
     }
 
     on <WordBuilder> {
-        "WordString(\"${it.str.escape()}\")"
+        "WordString(this, \"${it.str.escape()}\")"
     }
 
     on <StrTokenBuilder> {
@@ -169,30 +167,30 @@ val model_graph_compiler = Poly1 <ParserBuilder, String>().apply {
 
 
     on <KeywordBuilder> {
-        "Kword(this, Str(\"${it.str.escape()}\"))"
+        "Kword(this, \"${it.str.escape()}\")"
     }
 
     on <CharRangeBuilder> {
-        "CharRng('${it.start}', '${it.end}')"
+        "CharRng(this, '${it.start}', '${it.end}')"
     }
 
     on <CharSetBuilder> {
-        "CharSet(\"${it.str.escape()}\")"
+        "CharSet(this, \"${it.str.escape()}\")"
     }
 
     on <SeqBuilder> {
         val children = it.list
-                .map { digesto(it) }
-                .joinToString(separator = ", ")
-        "Seq(arrayListOf($children))"
+                .map { digesto(it) + "()" }
+                .joinToString(separator = "&& ")
+        "Seq(this, {$children })"
     }
 
     on <ChoiceBuilder> {
         val children = it.list
-                .map { digesto(it) }
-                .joinToString(separator = ", ")
+                .map { digesto(it) + "()" }
+                .joinToString(separator = " || ")
                 .replace("\n", "\n             ")
-        "Choice(arrayListOf($children))"
+        "Choice(this, {$children})"
     }
 
     on <LongestBuilder> {
@@ -213,112 +211,114 @@ val model_graph_compiler = Poly1 <ParserBuilder, String>().apply {
     }
 
     on <AheadBuilder> {
-        "Ahead(${digesto(it.child)})"
+        "Ahead(this, ${digesto(it.child)})"
     }
 
     on <NotBuilder> {
-        "Not(${digesto(it.child)})"
+        "NotAhead(this, ${digesto(it.child)})"
     }
 
     on <OptBuilder> {
-        "Opt(${digesto(it.child)})"
+        "Opt(this, ${digesto(it.child)})"
     }
     on <MaybeBuilder> {
-        "Maybe(${digesto(it.child)})"
+        "Maybe(this, ${digesto(it.child)})"
     }
     on <AsBoolBuilder> {
-        "AsBool(${digesto(it.child)})"
+        "AsBool(this, ${digesto(it.child)})"
     }
 
     on <Repeat0Builder> {
-        "Repeat0(${digesto(it.child)})"
+        "Repeat0(this, ${digesto(it.child)})"
     }
 
     on <Repeat1Builder> {
-        "Repeat1(${digesto(it.child)})"
+        "Repeat1(this, ${digesto(it.child)})"
     }
 
     on <AnglesBuilder> {
-        "Angles(${digesto(it.child)})"
+        "Angles(this, ${digesto(it.child)})"
     }
 
     on <CurliesBuilder> {
-        "Curlies(${digesto(it.child)})"
+        "Curlies(this, ${digesto(it.child)})"
     }
 
     on <SquaresBuilder> {
-        "Squares(${digesto(it.child)})"
+        "Squares(this, ${digesto(it.child)})"
     }
 
     on <ParensBuilder> {
-        "Parens(${digesto(it.child)})"
+        "Parens(this, ${digesto(it.child)})"
     }
 
     on <PlainTokenBuilder> {
         "Token(this, ${digesto(it.child)})"
     }
 
-    on <EmptyAnglesBuilder>  { "AnglesEmpty()" }
-    on <EmptyCurliesBuilder> { "CurliesEmpty()" }
-    on <EmptySquaresBuilder> { "SquaresEmpty()" }
-    on <EmptyParensBuilder>  { "ParensEmpty()" }
+    on <EmptyAnglesBuilder>  { "AnglesEmpty(this)" }
+    on <EmptyCurliesBuilder> { "CurliesEmpty(this)" }
+    on <EmptySquaresBuilder> { "SquaresEmpty(this)" }
+    on <EmptyParensBuilder>  { "ParensEmpty(this)" }
 
     on <CommaList0Builder> {
-        "CommaList0(${digesto(it.child)})"
+        "CommaList0(this, ${digesto(it.child)})"
     }
     on <CommaList1Builder> {
-        "CommaList1(${digesto(it.child)})"
+        "CommaList1(this, ${digesto(it.child)})"
     }
 
     on <CommaListTerm0Builder> {
-        "CommaListTerm0(${digesto(it.child)})"
+        "CommaListTerm0(this, ${digesto(it.child)})"
     }
     on <CommaListTerm1Builder> {
-        "CommaListTerm1(${digesto(it.child)})"
+        "CommaListTerm1(this, ${digesto(it.child)})"
     }
 
     on <AsValBuilder> {
-        "AsVal(${it.value}, ${digesto(it.child)} )"
+        "AsVal(this, ${it.value}, ${digesto(it.child)} )"
     }
 
     on <RepeatNBuilder> {
-        "Repeat(${it.n}, ${digesto(it.child)} )"
+        "Repeat(this, ${it.n}, ${digesto(it.child)} )"
     }
 
 
     on <Around0Builder> {
-        "Around0(${digesto(it.around)}, ${digesto(it.inside)})"
+        "Around0(this, ${digesto(it.around)}, ${digesto(it.inside)})"
     }
 
     on <Around1Builder> {
-        "Around1(${digesto(it.around)}, ${digesto(it.inside)})"
+        "Around1(this, ${digesto(it.around)}, ${digesto(it.inside)})"
     }
 
     on <Until0Builder> {
-        "Until0(${digesto(it.repeat)}, ${digesto(it.terminator)})"
+        "Until0(this, ${digesto(it.repeat)}, ${digesto(it.terminator)})"
     }
 
     on <Until1Builder> {
-        "Until1(${digesto(it.repeat)}, ${digesto(it.terminator)})"
+        "Until1(this, ${digesto(it.repeat)}, ${digesto(it.terminator)})"
     }
 
     on <BuildBuilder> {
         if (top_level)
-            "Build(${it.backlog},\n" +
+            "Build(this,\n" +
+                    "        ${it.backlog},\n" +
                     "        syntax = ${digesto(it.child)},\n" +
                     "        effect = {${it.effect.replace("\n", "\n" + " ".repeat(19))}})"
         else
-            "\nBuild(${it.backlog}, ${digesto(it.child)}, {${it.effect}})"
+            "\nBuild(this, ${it.backlog}, ${digesto(it.child)}, {${it.effect}})"
     }
 
     on <AffectBuilder> {
-        "Affect(${it.backlog},\n" +
+        "Affect(this,\n" +
+                "        ${it.backlog},\n" +
                 "        syntax = ${digesto(it.child)},\n" +
                 "        effect = {${it.effect}})"
     }
 
     on <BuildStrBuilder> {
-        "BuildStr(\n" +
+        "BuildStr(this,\n" +
                 "        syntax = ${digesto(it.child)},\n" +
                 "        value = {${it.effect}})"
     }
