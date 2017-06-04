@@ -56,7 +56,7 @@ class AffectStr (g: Grammar,
  */
 class Build (g: Grammar,
              val backlog: Int = 0,
-             val syntax: Parser,
+             val syntax: ()-> Boolean,
              val effect: Grammar.(Array<Any?>) -> Any)
              : Parser()
 {
@@ -71,7 +71,7 @@ class Build (g: Grammar,
  * The return value of [value] is pushed on the stack.
  */
 class BuildStr (g: Grammar,
-                val syntax: Parser,
+                val syntax: ()-> Boolean,
                 val value: Grammar.(String) -> Any = {it})
                 : Parser()
 {
@@ -85,7 +85,7 @@ class BuildStr (g: Grammar,
  * Matches [p] or, if [p] fails, pushes `null` on the stack.
  * Always succeeds.
  */
-class Maybe (g: Grammar, val p: Parser): Parser()
+class Maybe (g: Grammar, val p: ()-> Boolean): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.maybe(p)
@@ -98,7 +98,7 @@ class Maybe (g: Grammar, val p: Parser): Parser()
  * Also discards its stack frame.
  * Always suceeds.
  */
-class AsBool (g: Grammar, val p: Parser): Parser()
+class AsBool (g: Grammar, val p: ()-> Boolean): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.as_bool(p)
@@ -109,7 +109,7 @@ class AsBool (g: Grammar, val p: Parser): Parser()
 /**
  * Matches [p] then pushes [value] on the stack if successful.
  */
-class AsVal (g: Grammar, val value: Any?, val p: Parser): Parser()
+class AsVal (g: Grammar, val value: Any?, val p: ()-> Boolean): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.as_val(value, p)
@@ -123,7 +123,7 @@ class AsVal (g: Grammar, val value: Any?, val p: Parser): Parser()
  * All characters matched in this manner (excluding [terminator]) are collected in a string
  * which is pushed on the value stack.
  */
-class Gobble (g: Grammar, val terminator: Parser): Parser()
+class Gobble (g: Grammar, val terminator: ()-> Boolean): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.gobble(terminator)

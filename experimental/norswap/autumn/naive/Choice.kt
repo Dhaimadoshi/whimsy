@@ -46,7 +46,7 @@ class Longest (g: Grammar, vararg val ps: Parser): Parser()
  *
  * Side effects are retained only for the parser that is selected.
  */
-class LongestPure (g: Grammar, vararg val ps: Parser): Parser()
+class LongestPure (g: Grammar, vararg val ps: ()-> Boolean): Parser()
 {
     init { grammar = g }
     val longest_pure = LongestPure0(g, ps.cast())

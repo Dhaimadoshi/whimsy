@@ -88,7 +88,7 @@ class WordString (g: Grammar, val str: String): Parser()
 /**
  * Matches the same thing as [p], and any trailing whitespace (as defined by [Grammar.whitespace]).
  */
-class WordParser (g: Grammar, val p: Parser): Parser()
+class WordParser (g: Grammar, val p: ()-> Boolean): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.word(p)
