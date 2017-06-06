@@ -44,7 +44,7 @@ val kotlin_keywords = listOf(
 
 /**
  * List of parser builders that result in a value definition instead of a function definition
- * (said otherwise, their expressions return `Parser` rather than `Boolean`).
+ * (said otherwise, their expressions return `NaiveParser` rather than `Boolean`).
  */
 val val_parsers = listOf<Class<out ParserBuilder>>(
     TokenBuilder        ::class.java,
@@ -112,7 +112,7 @@ fun compile_model (klass_name: String, model: Any): String
     val b = StringBuilder()
 
     b += "package norswap.lang.java8\n"
-    b += "import norswap.autumn.Parser\n"
+    b += "import norswap.autumn.NaiveParser\n"
     b += "import norswap.autumn.TokenGrammar\n"
     b += "import norswap.autumn.parsers.*\n"
     b += "import norswap.lang.java_base.*\n"
@@ -172,7 +172,7 @@ val compile_top_level = Poly1<Builder, String>().apply {
 
         if (it.attributes.contains(TypeHint))
             if (func)   b += " : Boolean"
-            else        b += " : Parser"
+            else        b += " : NaiveParser"
 
         if (equal_same_line.contains(it::class.java))
             b += " = $str"

@@ -1,5 +1,6 @@
 package norswap.autumn.model
 
+import norswap.autumn.naive.*
 import norswap.lang.java8.Java8Model
 import norswap.lang.java_base.escape
 import norswap.utils.camel_to_snake
@@ -15,29 +16,27 @@ import java.io.PrintWriter
 
 fun main (args: Array<String>)
 {
-    val str = compile_model_to_graph("NaiveGrammar2", Java8Model())
+    val str = compile_naive_model("NaiveGrammar2", Java8Model())
     val writer = PrintWriter("src/norswap/lang/java8/NaiveGrammar2.kt")
     writer.println(str)
     writer.flush()
 }
 
-var named_rule = listOf<String>()
-
+// List of all the rule's name defined in model for recursive call
+// Reference parser for those are going to be snake "case" while calls to Naive parser are going to be camelcase
+var rule_name_iden = listOf<String>()
 // -------------------------------------------------------------------------------------------------
 
 /**
  * Compile a grammar model to an Autumn grammar source string.
  */
-fun compile_model_to_graph (klass_name: String, model: Any): String
+fun compile_naive_model(klass_name: String, model: Any): String
 {
     order_next = 0
     val b = StringBuilder()
 
     b += "package norswap.lang.java8\n"
-    b += "import norswap.autumn.parsers.*\n"
     b += "import norswap.autumn.TokenGrammar\n"
-    b += "import norswap.autumn.model.keyword\n"
-    b += "import norswap.autumn.model.token\n"
     b += "import norswap.autumn.naive.*\n"
     b += "import norswap.autumn.naive.AssocLeft\n"
     b += "import norswap.autumn.naive.NotAhead\n"
@@ -47,20 +46,22 @@ fun compile_model_to_graph (klass_name: String, model: Any): String
 
     b += "class $klass_name: TokenGrammar()\n{"
 
+    // initialize rule_name_iden through reflection
     model::class.java.methods
             .filter { supers <Builder> (it.returnType) }
-            .forEach { named_rule += it.name.kotlin_getter_to_val_name() }
+            .forEach { rule_name_iden += it.name.kotlin_getter_to_val_name() }
 
     builders(model).forEach {
         b += "\n\n"
-        b += compile_graph_top_level(it)
+        b += compile_naive_top_level(it)
     }
 
+    // since all the parsers are value, we still need to overide those 2 functions
+    b += "\n\n    override fun whitespace() = whitespace.invoke()"
     b += "\n\n    override fun root() = root.invoke()"
     b += "\n}"
     return b.toString()
 }
-
 
 fun String.escape(): String
 {
@@ -77,15 +78,7 @@ fun String.escape(): String
     return b.toString()
 }
 
-fun Poly1<ParserBuilder, String>.digesto(p: ParserBuilder): String
-{
-    top_level = false
-//    val func = if (!val_parsers.contains(p::class.java)) "()" else ""
-//    return p.name ?. let { "$it$func" } ?: invoke(p)
-    return p.name ?: invoke(p)
-}
-
-val compile_graph_top_level = Poly1<Builder, String>().apply {
+val compile_naive_top_level = Poly1<Builder, String>().apply {
 
     default { "" }
 
@@ -109,38 +102,32 @@ val compile_graph_top_level = Poly1<Builder, String>().apply {
 
     on <ParserBuilder> {
         top_level = true
-//        val func = !val_parsers.contains(it::class.java)
-        val str = model_graph_compiler(it)
+        val str = naive_model_compiler(it)
         val b = StringBuilder()
         b += "    "
 
-//        if (overrides.contains(it.name))
-//            b += "override "
-
-//        if (func)   b += "fun ${it.name}()"
-//        else        b += "val ${it.name}"
         b += "val ${it.name}"
 
-        if (it.attributes.contains(TypeHint)) b += " : Parser"
+        if (it.attributes.contains(TypeHint)) b += " : NaiveParser"
 
-//        if (equal_same_line.contains(it::class.java))
-            b += " = $str"
-//        else
-//            b += "\n        = $str"
-
-//        b += "()"
+        b += " = $str"
 
         b.toString()
     }
 }
 
-// TODO check what to do with Token grammar dependend parser
-val model_graph_compiler = Poly1 <ParserBuilder, String>().apply {
+fun Poly1<ParserBuilder, String>.simple_digest(p: ParserBuilder): String
+{
+    top_level = false
+    return p.name ?: invoke(p)
+}
+
+val naive_model_compiler = Poly1 <ParserBuilder, String>().apply {
 
     // TODO : ref to class or ref to val ?
     on <ReferenceBuilder> {
-        if (named_rule.contains(it.str))
-            it.str.camel_to_snake()
+        if (rule_name_iden.contains(it.str))
+            "{ ${it.str.camel_to_snake()}() }"    // surrounding {()} avoid "need to be initialized" problem in recursive definitions of the grammar
         else
             it.str.snake_to_camel() + "(this)"
     }
@@ -158,13 +145,12 @@ val model_graph_compiler = Poly1 <ParserBuilder, String>().apply {
     }
 
     on <StrTokenBuilder> {
-        "StrToken(this, \"${it.str.escape()}\")"
+        "Token(this, \"${it.str.escape()}\")"
     }
 
     on <TokenBuilder> {
-        "Token(this, { ${it.value} }, ${digesto(it.child)})"
+        "Token(this, { ${it.value} }, ${simple_digest(it.child)})"
     }
-
 
     on <KeywordBuilder> {
         "Kword(this, \"${it.str.escape()}\")"
@@ -180,80 +166,77 @@ val model_graph_compiler = Poly1 <ParserBuilder, String>().apply {
 
     on <SeqBuilder> {
         val children = it.list
-                .map { digesto(it) + "()" }
-                .joinToString(separator = "&& ")
-        "Seq(this, {$children })"
+                .map { "${simple_digest(it)}()" }
+                .joinToString(separator = " && ")
+        "Seq(this, { $children })"
     }
 
     on <ChoiceBuilder> {
         val children = it.list
-                .map { digesto(it) + "()" }
+                .map { "${simple_digest(it)}()" }
                 .joinToString(separator = " || ")
                 .replace("\n", "\n             ")
-        "Choice(this, {$children})"
+        "Choice(this, { $children })"
     }
 
     on <LongestBuilder> {
         val children = it.list
-                // use short form when possible (`name`, not `{ name() }`)
-                //.map { it.name ?: "{ ${digesto(it)} }" }
-                .map { digesto(it) }
+                .map { simple_digest(it) }
                 .joinToString(separator = ", ")
-        // TODO Check if this is correct, not sure for the grammar receiver (this)
         "Longest(this, arrayListOf($children) )"
     }
 
     on <TokenChoiceBuilder> {
         val children = it.list
-                .map { digesto(it) }
+                .map { it.name + ".token" }
                 .joinToString()
         "TokenChoice(this, $children)"
     }
 
     on <AheadBuilder> {
-        "Ahead(this, ${digesto(it.child)})"
+        "Ahead(this, ${simple_digest(it.child)})"
     }
 
     on <NotBuilder> {
-        "NotAhead(this, ${digesto(it.child)})"
+        "NotAhead(this, ${simple_digest(it.child)})"
     }
 
     on <OptBuilder> {
-        "Opt(this, ${digesto(it.child)})"
+        "Opt(this, ${simple_digest(it.child)})"
     }
     on <MaybeBuilder> {
-        "Maybe(this, ${digesto(it.child)})"
+        "Maybe(this, ${simple_digest(it.child)})"
     }
     on <AsBoolBuilder> {
-        "AsBool(this, ${digesto(it.child)})"
+        "AsBool(this, ${simple_digest(it.child)})"
     }
 
     on <Repeat0Builder> {
-        "Repeat0(this, ${digesto(it.child)})"
+        "Repeat0(this, ${simple_digest(it.child)})"
     }
 
     on <Repeat1Builder> {
-        "Repeat1(this, ${digesto(it.child)})"
+        "Repeat1(this, ${simple_digest(it.child)})"
     }
 
     on <AnglesBuilder> {
-        "Angles(this, ${digesto(it.child)})"
+        "Angles(this, ${simple_digest(it.child)})"
     }
 
     on <CurliesBuilder> {
-        "Curlies(this, ${digesto(it.child)})"
+        "Curlies(this, ${simple_digest(it.child)})"
     }
 
     on <SquaresBuilder> {
-        "Squares(this, ${digesto(it.child)})"
+        "Squares(this, ${simple_digest(it.child)})"
     }
 
     on <ParensBuilder> {
-        "Parens(this, ${digesto(it.child)})"
+        "Parens(this, ${simple_digest(it.child)})"
     }
 
     on <PlainTokenBuilder> {
-        "Token(this, ${digesto(it.child)})"
+        "Token(this, {${simple_digest(it.child)}()})"
     }
 
     on <EmptyAnglesBuilder>  { "AnglesEmpty(this)" }
@@ -262,77 +245,67 @@ val model_graph_compiler = Poly1 <ParserBuilder, String>().apply {
     on <EmptyParensBuilder>  { "ParensEmpty(this)" }
 
     on <CommaList0Builder> {
-        "CommaList0(this, ${digesto(it.child)})"
+        "CommaList0(this, ${simple_digest(it.child)})"
     }
     on <CommaList1Builder> {
-        "CommaList1(this, ${digesto(it.child)})"
+        "CommaList1(this, ${simple_digest(it.child)})"
     }
 
     on <CommaListTerm0Builder> {
-        "CommaListTerm0(this, ${digesto(it.child)})"
+        "CommaListTerm0(this, ${simple_digest(it.child)})"
     }
     on <CommaListTerm1Builder> {
-        "CommaListTerm1(this, ${digesto(it.child)})"
+        "CommaListTerm1(this, ${simple_digest(it.child)})"
     }
 
     on <AsValBuilder> {
-        "AsVal(this, ${it.value}, ${digesto(it.child)} )"
+        "AsVal(this, ${it.value}, ${simple_digest(it.child)} )"
     }
 
     on <RepeatNBuilder> {
-        "Repeat(this, ${it.n}, ${digesto(it.child)} )"
+        "Repeat(this, ${it.n}, ${simple_digest(it.child)} )"
     }
 
 
     on <Around0Builder> {
-        "Around0(this, ${digesto(it.around)}, ${digesto(it.inside)})"
+        "Around0(this, ${simple_digest(it.around)}, ${simple_digest(it.inside)})"
     }
 
     on <Around1Builder> {
-        "Around1(this, ${digesto(it.around)}, ${digesto(it.inside)})"
+        "Around1(this, ${simple_digest(it.around)}, ${simple_digest(it.inside)})"
     }
 
     on <Until0Builder> {
-        "Until0(this, ${digesto(it.repeat)}, ${digesto(it.terminator)})"
+        "Until0(this, ${simple_digest(it.repeat)}, ${simple_digest(it.terminator)})"
     }
 
     on <Until1Builder> {
-        "Until1(this, ${digesto(it.repeat)}, ${digesto(it.terminator)})"
+        "Until1(this, ${simple_digest(it.repeat)}, ${simple_digest(it.terminator)})"
     }
 
     on <BuildBuilder> {
         if (top_level)
             "Build(this,\n" +
                     "        ${it.backlog},\n" +
-                    "        syntax = ${digesto(it.child)},\n" +
+                    "        syntax = ${simple_digest(it.child)},\n" +
                     "        effect = {${it.effect.replace("\n", "\n" + " ".repeat(19))}})"
         else
-            "\nBuild(this, ${it.backlog}, ${digesto(it.child)}, {${it.effect}})"
+            "\nBuild(this, ${it.backlog}, ${simple_digest(it.child)}, {${it.effect}})"
     }
 
     on <AffectBuilder> {
         "Affect(this,\n" +
                 "        ${it.backlog},\n" +
-                "        syntax = ${digesto(it.child)},\n" +
+                "        syntax = ${simple_digest(it.child)},\n" +
                 "        effect = {${it.effect}})"
     }
 
     on <BuildStrBuilder> {
         "BuildStr(this,\n" +
-                "        syntax = ${digesto(it.child)},\n" +
+                "        syntax = ${simple_digest(it.child)},\n" +
                 "        value = {${it.effect}})"
     }
 
-    // TODOclass AssocLeftBuilder: ParserBuilder()
-//    {
-//        val operators = ArrayList<OperatorBuilder>()
-//
-//        var left: ParserBuilder? = null
-//        var right: ParserBuilder? = null
-//        var operands: ParserBuilder? = null
-//        var strict: Boolean? = null
-
-    // class AssocLeft (g: Grammar, val init: AssocLeft.() -> Unit): Parser()
     on <AssocLeftBuilder> {
         val b = StringBuilder()
 
@@ -345,14 +318,15 @@ val model_graph_compiler = Poly1 <ParserBuilder, String>().apply {
         if (it.strict != null)
             b += "        strict = ${it.strict!!}\n"
         if (it.operands != null)
-            b += "        operands = { ${digesto(it.operands!!)}() }\n"
+            b += "        operands = { ${simple_digest(it.operands!!)}() }\n"
         if (it.left != null)
-            b += "        left = { ${digesto(it.left!!)}() }\n"
+            b += "        left = { ${simple_digest(it.left!!)}() }\n"
         if (it.right != null)
-            b += "        right = { ${digesto(it.right!!)}() }\n"
+            b += "        right = { ${simple_digest(it.right!!)}() }\n"
 
+        // TODO : call to this in this part is going to create ambiguity
         it.operators.forEach {
-            b += "        ${it.kind}({ ${digesto(it.parser)}() }, { ${it.effect} })\n"
+            b += "        ${it.kind}({ ${simple_digest(it.parser)}() }, { ${it.effect} })\n"
         }
 
         b += "    }"
