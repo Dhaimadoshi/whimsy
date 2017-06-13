@@ -1,5 +1,4 @@
 package norswap.autumn.model
-import norswap.lang.java8.Java8Model
 import norswap.utils.Visitable
 
 // -------------------------------------------------------------------------------------------------
@@ -212,6 +211,10 @@ object EmptyAnglesBuilder   : EmptyBracketsBuilder("<", ">")
 object EmptySquaresBuilder  : EmptyBracketsBuilder("[", "]")
 object EmptyCurliesBuilder  : EmptyBracketsBuilder("{", "}")
 object EmptyParensBuilder   : EmptyBracketsBuilder("(", ")")
+
+// -------------------------------------------------------------------------------------------------
+
+class ParameterlessBuilder (val parser_name: String): LeafBuilder()
 
 // -------------------------------------------------------------------------------------------------
 

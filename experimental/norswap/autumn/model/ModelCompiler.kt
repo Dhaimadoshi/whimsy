@@ -1,4 +1,6 @@
-package norswap.autumn.model
+@file:Suppress("PackageDirectoryMismatch")
+package norswap.autumn.model.compiler
+import norswap.autumn.model.*
 import norswap.lang.java_base.escape
 import norswap.lang.java8.Java8Model
 import norswap.utils.*
@@ -30,7 +32,7 @@ var top_level = true
  */
 val overrides = listOf("whitespace", "root")
 
-// --------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 /**
  * List of Kotlin keywords, that have to be escaped with backquotes if used as parser names.
@@ -44,7 +46,7 @@ val kotlin_keywords = listOf(
 
 /**
  * List of parser builders that result in a value definition instead of a function definition
- * (said otherwise, their expressions return `NaiveParser` rather than `Boolean`).
+ * (said otherwise, their expressions return `Parser` rather than `Boolean`).
  */
 val val_parsers = listOf<Class<out ParserBuilder>>(
     TokenBuilder        ::class.java,
@@ -112,7 +114,7 @@ fun compile_model (klass_name: String, model: Any): String
     val b = StringBuilder()
 
     b += "package norswap.lang.java8\n"
-    b += "import norswap.autumn.NaiveParser\n"
+    b += "import norswap.autumn.Parser\n"
     b += "import norswap.autumn.TokenGrammar\n"
     b += "import norswap.autumn.parsers.*\n"
     b += "import norswap.lang.java_base.*\n"
@@ -141,8 +143,8 @@ val compile_top_level = Poly1<Builder, String>().apply {
 
     on <SectionBuilder> {
         when (it.level) {
-            1 ->  "    /// ${it.name!!.capitalize()} " + "=".repeat(91 - it.name!!.length)
-            2 -> "    // ${it.name!!.capitalize()} " + "-".repeat(71 - it.name!!.length)
+            1 -> "    /// ${it.name!!.capitalize()} " + "=".repeat(91 - it.name!!.length)
+            2 ->  "    // ${it.name!!.capitalize()} " + "-".repeat(71 - it.name!!.length)
             else -> ""
     }   }
 
@@ -172,7 +174,7 @@ val compile_top_level = Poly1<Builder, String>().apply {
 
         if (it.attributes.contains(TypeHint))
             if (func)   b += " : Boolean"
-            else        b += " : NaiveParser"
+            else        b += " : Parser"
 
         if (equal_same_line.contains(it::class.java))
             b += " = $str"
@@ -185,10 +187,10 @@ val compile_top_level = Poly1<Builder, String>().apply {
 
 // -------------------------------------------------------------------------------------------------
 
-fun Poly1<ParserBuilder, String>.digest(p: ParserBuilder): String
+fun digest (p: ParserBuilder): String
 {
     top_level = false
-    return p.name ?. let { "$it()" } ?: invoke(p)
+    return p.name ?. let { "$it()" } ?: model_compiler(p)
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -265,9 +267,8 @@ val model_compiler = Poly1 <ParserBuilder, String>().apply {
     }
 
     on <TokenChoiceBuilder> {
-        val children = it.list
-            .map { it.name }
-            .joinToString()
+        // Implicit assumption: the tokens have been assigned to variables.
+        val children = it.list.map { it.name }.joinToString()
         "token_choice($children)"
     }
 
@@ -339,13 +340,11 @@ val model_compiler = Poly1 <ParserBuilder, String>().apply {
     on <BuildStrBuilder> {
         "build_str(\n" +
             "        syntax = { ${digest(it.child)} },\n" +
-            "        effect = { TODO() })"
+            "        effect = { ${it.effect} })"
     }
 
-    on <BuildStrBuilder> {
-        "build_str(\n" +
-            "        syntax = { ${digest(it.child)} },\n" +
-            "        effect = { ${it.effect} })"
+    on <ParameterlessBuilder> {
+        it.parser_name + "()"
     }
 
     on <AssocLeftBuilder> {
