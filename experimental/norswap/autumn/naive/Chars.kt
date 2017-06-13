@@ -14,9 +14,8 @@ This file contains parsers that match at the character level.
 /**
  * Matches any character that satisfied [pred].
  */
-class CharPred (g: Grammar, val pred: (Char) -> Boolean): Parser()
+class CharPred (val pred: (Char) -> Boolean): Parser()
 {
-    init { grammar = g }
     override fun invoke() = grammar.char_pred(pred)
 }
 
@@ -26,9 +25,8 @@ class CharPred (g: Grammar, val pred: (Char) -> Boolean): Parser()
  * Matches any character.
  * Only fails when the end of the input (represented by the null byte) is reached.
  */
-class CharAny(g: Grammar): Parser()
+class CharAny: Parser()
 {
-    init { grammar = g }
     override fun invoke() = grammar.char_any()
 }
 
@@ -37,9 +35,8 @@ class CharAny(g: Grammar): Parser()
 /**
  * Matches any character in the range between [start] and [end].
  */
-class CharRng(g: Grammar, val start: Char, val end: Char): Parser()
+class CharRng(val start: Char, val end: Char): Parser()
 {
-    init { grammar = g }
     override fun invoke() = grammar.char_range(start, end)
 }
 
@@ -48,10 +45,9 @@ class CharRng(g: Grammar, val start: Char, val end: Char): Parser()
 /**
  * Matches any of the characters in [chars].
  */
-class CharSet (g: Grammar, val chars: String): Parser()
+class CharSet (val chars: String): Parser()
 {
-    init { grammar = g }
-    constructor (g: Grammar, vararg c: Char): this(g, String(c))
+    constructor (vararg c: Char): this(String(c))
     override fun invoke() = grammar.char_set(chars)
 }
 
@@ -60,26 +56,17 @@ class CharSet (g: Grammar, val chars: String): Parser()
 /**
  * Matches [str].
  */
-class Str (g: Grammar, val str: String): Parser()
+class Str (val str: String): Parser()
 {
-
-    init { grammar = g }
-    override fun invoke(): Boolean
-    {
-        dosomestuff()
-        return grammar.string(str)
-    }
-
-    fun dosomestuff() = println("I'm hooked and I do some cool stuff")
+    override fun invoke() = grammar.string(str)
 }
 // -------------------------------------------------------------------------------------------------
 
 /**
  * Matches [str], and any trailing whitespace (as defined by [Grammar.whitespace]).
  */
-class WordString (g: Grammar, val str: String): Parser()
+class WordString (val str: String): Parser()
 {
-    init { grammar = g }
     override fun invoke() = grammar.word(str)
 }
 
@@ -88,9 +75,8 @@ class WordString (g: Grammar, val str: String): Parser()
 /**
  * Matches the same thing as [p], and any trailing whitespace (as defined by [Grammar.whitespace]).
  */
-class WordParser (g: Grammar, val p: Parser): Parser()
+class WordParser (val p: Parser): Parser()
 {
-    init { grammar = g }
     override fun invoke() = grammar.word(p)
 }
 
@@ -99,9 +85,8 @@ class WordParser (g: Grammar, val p: Parser): Parser()
 /**
  * Matches an alphabetic character (the ranges a-z and A-Z).
  */
-class Alpha(g: Grammar): Parser()
+class Alpha: Parser()
 {
-    init { grammar = g }
     override fun invoke() = grammar.alpha()
 }
 
@@ -110,9 +95,8 @@ class Alpha(g: Grammar): Parser()
 /**
  * Matches an alphanumeric character (the ranges a-z, A-Z and 0-9).
  */
-class Alphanum(g: Grammar): Parser()
+class Alphanum: Parser()
 {
-    init { grammar = g }
     override fun invoke() = grammar.alphanum()
 }
 
@@ -121,9 +105,8 @@ class Alphanum(g: Grammar): Parser()
 /**
  * Matches a digit (the range 0-9).
  */
-class Digit(g: Grammar): Parser()
+class Digit: Parser()
 {
-    init { grammar = g }
     override fun invoke() = grammar.digit()
 }
 
@@ -132,9 +115,8 @@ class Digit(g: Grammar): Parser()
 /**
  * Matches an hexadecimal digit (the ranges a-f, A-F and 0-9).
  */
-class HexDigit(g: Grammar): Parser()
+class HexDigit: Parser()
 {
-    init { grammar = g }
     override fun invoke() = grammar.hex_digit()
 }
 
@@ -143,9 +125,8 @@ class HexDigit(g: Grammar): Parser()
 /**
  * Matches an octal digit (the range 0-7).
  */
-class OctalDigit(g: Grammar): Parser()
+class OctalDigit: Parser()
 {
-    init { grammar = g }
     override fun invoke() = grammar.octal_digit()
 }
 
@@ -154,9 +135,8 @@ class OctalDigit(g: Grammar): Parser()
 /**
  * Matches a whitespace character, as defined by [Char.isWhitespace].
  */
-class SpaceChar(g: Grammar): Parser()
+class SpaceChar: Parser()
 {
-    init { grammar = g }
     override fun invoke() = grammar.space_char()
 }
 
@@ -165,9 +145,8 @@ class SpaceChar(g: Grammar): Parser()
 /**
  * Matches a java identifier (as defined by JLS 3.8).
  */
-class JavaIden(g: Grammar): Parser()
+class JavaIden: Parser()
 {
-    init { grammar = g }
     override fun invoke() = grammar.java_iden()
 }
 
@@ -177,9 +156,8 @@ class JavaIden(g: Grammar): Parser()
  * Matches a java identifier that consists (as defined by JLS 3.8) that consists only of
  * ASCII characters.
  */
-class AsciiJavaIden(g: Grammar): Parser()
+class AsciiJavaIden: Parser()
 {
-    init { grammar = g }
     override fun invoke() = grammar.ascii_java_iden()
 }
 

@@ -1,6 +1,4 @@
 package norswap.autumn
-import norswap.autumn.naive.Str
-import norswap.autumn.naive.Token
 import norswap.autumn.parsers.LongestPure
 import norswap.autumn.parsers.string
 
@@ -40,7 +38,7 @@ abstract class TokenGrammar: Grammar()
 
     // ---------------------------------------------------------------------------------------------
 
-    fun token (generator: TokenGenerator = { it }, p: Parser): Parser
+    protected fun token (generator: TokenGenerator = { it }, p: Parser): Parser
     {
         val index = next_index++
         parsers.add(p)

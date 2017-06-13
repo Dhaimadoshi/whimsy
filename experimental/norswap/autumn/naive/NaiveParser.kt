@@ -3,5 +3,5 @@ import norswap.autumn.Grammar
 
 abstract class NaiveParser : () -> Boolean
 {
-   lateinit var grammar: Grammar
+    lateinit var grammar: Grammar
 }
