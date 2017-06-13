@@ -2,7 +2,7 @@ package norswap.lang.java8.benchmark
 import norswap.autumn.CaughtException
 import norswap.autumn.UncaughtException
 //import norswap.lang.java8.Grammar2
-//import norswap.lang.java8.GraphGrammar
+import norswap.lang.java8.GraphGrammar
 import norswap.lang.java8.Java8Grammar
 import norswap.utils.glob
 import norswap.utils.read_file
@@ -15,15 +15,15 @@ import kotlin.system.measureNanoTime
 
 fun main (args: Array<String>)
 {
-    val g = Java8Grammar()
+//    val g = Java8Grammar()
 //    val g = Grammar2()
-//    val g = GraphGrammar()
+    val g = GraphGrammar()
 
     val os = System.getProperty("os.name")
 
     val corpus =
         if (os == "Mac OS X")
-            "/Users/nilaurent/Documents/bench" // 14.9
+            "/Users/dhai/Dropbox/thesis/spring" // 14.9
         else
             "D:/spring" // 21.8
 

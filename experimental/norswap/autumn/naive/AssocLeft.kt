@@ -24,7 +24,7 @@ import norswap.autumn.parsers.assoc_left
  * a language. This can be controlled through the [strict] property (should be set in the
  * initialization function).
  */
-class AssocLeft (g: Grammar, val init: AssocLeft.() -> Unit): NaiveParser()
+class AssocLeft (g: Grammar, val init: AssocLeft.() -> Unit): Parser()
 {
     init { grammar = g }
     val assoc_left = g.assoc_left(init)

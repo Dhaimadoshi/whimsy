@@ -35,7 +35,7 @@ class CharAny: Parser()
 /**
  * Matches any character in the range between [start] and [end].
  */
-class CharRng(val start: Char, val end: Char): Parser()
+class CharRange(val start: Char, val end: Char): Parser()
 {
     override fun invoke() = grammar.char_range(start, end)
 }
