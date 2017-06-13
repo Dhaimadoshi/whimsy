@@ -1,7 +1,6 @@
 package norswap.autumn.naive
 
 import norswap.autumn.Grammar
-import norswap.autumn.Parser
 import norswap.autumn.parsers.*
 
 // -------------------------------------------------------------------------------------------------
@@ -24,7 +23,7 @@ class Affect (g: Grammar,
               val backlog: Int = 0,
               val syntax: Parser,
               val effect: Grammar.(Array<Any?>) -> Unit)
-              : NaiveParser()
+              : Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.affect(backlog, syntax, effect)
@@ -38,7 +37,7 @@ class Affect (g: Grammar,
 class AffectStr (g: Grammar,
                  val syntax: Parser,
                  val effect: Grammar.(String) -> Unit)
-                 : NaiveParser()
+                 : Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.affect_str(syntax, effect)
@@ -59,7 +58,7 @@ class Build (g: Grammar,
              val backlog: Int = 0,
              val syntax: Parser,
              val effect: Grammar.(Array<Any?>) -> Any)
-             : NaiveParser()
+             : Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.build(backlog, syntax, effect)
@@ -74,7 +73,7 @@ class Build (g: Grammar,
 class BuildStr (g: Grammar,
                 val syntax: Parser,
                 val value: Grammar.(String) -> Any = {it})
-                : NaiveParser()
+                : Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.build_str(syntax, value)
@@ -86,7 +85,7 @@ class BuildStr (g: Grammar,
  * Matches [p] or, if [p] fails, pushes `null` on the stack.
  * Always succeeds.
  */
-class Maybe (g: Grammar, val p: Parser): NaiveParser()
+class Maybe (g: Grammar, val p: Parser): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.maybe(p)
@@ -99,7 +98,7 @@ class Maybe (g: Grammar, val p: Parser): NaiveParser()
  * Also discards its stack frame.
  * Always suceeds.
  */
-class AsBool (g: Grammar, val p: Parser): NaiveParser()
+class AsBool (g: Grammar, val p: Parser): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.as_bool(p)
@@ -110,7 +109,7 @@ class AsBool (g: Grammar, val p: Parser): NaiveParser()
 /**
  * Matches [p] then pushes [value] on the stack if successful.
  */
-class AsVal (g: Grammar, val value: Any?, val p: Parser): NaiveParser()
+class AsVal (g: Grammar, val value: Any?, val p: Parser): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.as_val(value, p)
@@ -124,7 +123,7 @@ class AsVal (g: Grammar, val value: Any?, val p: Parser): NaiveParser()
  * All characters matched in this manner (excluding [terminator]) are collected in a string
  * which is pushed on the value stack.
  */
-class Gobble (g: Grammar, val terminator: Parser): NaiveParser()
+class Gobble (g: Grammar, val terminator: Parser): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.gobble(terminator)

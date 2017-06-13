@@ -14,7 +14,7 @@ This file contains parsers that match at the character level.
 /**
  * Matches any character that satisfied [pred].
  */
-class CharPred (g: Grammar, val pred: (Char) -> Boolean): NaiveParser()
+class CharPred (g: Grammar, val pred: (Char) -> Boolean): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.char_pred(pred)
@@ -26,7 +26,7 @@ class CharPred (g: Grammar, val pred: (Char) -> Boolean): NaiveParser()
  * Matches any character.
  * Only fails when the end of the input (represented by the null byte) is reached.
  */
-class CharAny(g: Grammar): NaiveParser()
+class CharAny(g: Grammar): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.char_any()
@@ -37,7 +37,7 @@ class CharAny(g: Grammar): NaiveParser()
 /**
  * Matches any character in the range between [start] and [end].
  */
-class CharRng(g: Grammar, val start: Char, val end: Char): NaiveParser()
+class CharRng(g: Grammar, val start: Char, val end: Char): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.char_range(start, end)
@@ -48,7 +48,7 @@ class CharRng(g: Grammar, val start: Char, val end: Char): NaiveParser()
 /**
  * Matches any of the characters in [chars].
  */
-class CharSet (g: Grammar, val chars: String): NaiveParser()
+class CharSet (g: Grammar, val chars: String): Parser()
 {
     init { grammar = g }
     constructor (g: Grammar, vararg c: Char): this(g, String(c))
@@ -60,24 +60,24 @@ class CharSet (g: Grammar, val chars: String): NaiveParser()
 /**
  * Matches [str].
  */
-class Str (g: Grammar, val str: String): NaiveParser()
+class Str (g: Grammar, val str: String): Parser()
 {
 
     init { grammar = g }
     override fun invoke(): Boolean
     {
-       // dosomestuff()
+        dosomestuff()
         return grammar.string(str)
     }
 
-   // fun dosomestuff() = println("I'm hooked and I do some cool stuff")
+    fun dosomestuff() = println("I'm hooked and I do some cool stuff")
 }
 // -------------------------------------------------------------------------------------------------
 
 /**
  * Matches [str], and any trailing whitespace (as defined by [Grammar.whitespace]).
  */
-class WordString (g: Grammar, val str: String): NaiveParser()
+class WordString (g: Grammar, val str: String): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.word(str)
@@ -88,7 +88,7 @@ class WordString (g: Grammar, val str: String): NaiveParser()
 /**
  * Matches the same thing as [p], and any trailing whitespace (as defined by [Grammar.whitespace]).
  */
-class WordParser (g: Grammar, val p: ()-> Boolean): NaiveParser()
+class WordParser (g: Grammar, val p: Parser): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.word(p)
@@ -99,7 +99,7 @@ class WordParser (g: Grammar, val p: ()-> Boolean): NaiveParser()
 /**
  * Matches an alphabetic character (the ranges a-z and A-Z).
  */
-class Alpha(g: Grammar): NaiveParser()
+class Alpha(g: Grammar): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.alpha()
@@ -110,7 +110,7 @@ class Alpha(g: Grammar): NaiveParser()
 /**
  * Matches an alphanumeric character (the ranges a-z, A-Z and 0-9).
  */
-class Alphanum(g: Grammar): NaiveParser()
+class Alphanum(g: Grammar): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.alphanum()
@@ -121,7 +121,7 @@ class Alphanum(g: Grammar): NaiveParser()
 /**
  * Matches a digit (the range 0-9).
  */
-class Digit(g: Grammar): NaiveParser()
+class Digit(g: Grammar): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.digit()
@@ -132,7 +132,7 @@ class Digit(g: Grammar): NaiveParser()
 /**
  * Matches an hexadecimal digit (the ranges a-f, A-F and 0-9).
  */
-class HexDigit(g: Grammar): NaiveParser()
+class HexDigit(g: Grammar): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.hex_digit()
@@ -143,7 +143,7 @@ class HexDigit(g: Grammar): NaiveParser()
 /**
  * Matches an octal digit (the range 0-7).
  */
-class OctalDigit(g: Grammar): NaiveParser()
+class OctalDigit(g: Grammar): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.octal_digit()
@@ -154,7 +154,7 @@ class OctalDigit(g: Grammar): NaiveParser()
 /**
  * Matches a whitespace character, as defined by [Char.isWhitespace].
  */
-class SpaceChar(g: Grammar): NaiveParser()
+class SpaceChar(g: Grammar): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.space_char()
@@ -165,7 +165,7 @@ class SpaceChar(g: Grammar): NaiveParser()
 /**
  * Matches a java identifier (as defined by JLS 3.8).
  */
-class JavaIden(g: Grammar): NaiveParser()
+class JavaIden(g: Grammar): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.java_iden()
@@ -177,7 +177,7 @@ class JavaIden(g: Grammar): NaiveParser()
  * Matches a java identifier that consists (as defined by JLS 3.8) that consists only of
  * ASCII characters.
  */
-class AsciiJavaIden(g: Grammar): NaiveParser()
+class AsciiJavaIden(g: Grammar): Parser()
 {
     init { grammar = g }
     override fun invoke() = grammar.ascii_java_iden()
