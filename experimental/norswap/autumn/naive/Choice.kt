@@ -18,7 +18,7 @@ This file contains parsers that perform a choice between their sub-parsers.
  */
 class Choice (vararg val ps: Parser): Parser()
 {
-    override fun invoke() = grammar.choice { ps.any(Parser::invoke) }
+    init { parser = {grammar.choice { ps.any(Parser::invoke) }} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -30,9 +30,10 @@ class Choice (vararg val ps: Parser): Parser()
  */
 class Longest (g: Grammar, vararg val ps: Parser): Parser()
 {
-    init { grammar = g }
-    val longest = Longest0(g, ps.cast())
-    override fun invoke() = longest()
+    init {
+        grammar = g
+        parser = Longest0(g, ps.cast())
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -44,9 +45,10 @@ class Longest (g: Grammar, vararg val ps: Parser): Parser()
  */
 class LongestPure (g: Grammar, vararg val ps: Parser): Parser()
 {
-    init { grammar = g }
-    val longest_pure = LongestPure0(g, ps.cast())
-    override fun invoke() = longest_pure()
+    init {
+        grammar = g
+        parser = LongestPure0(g, ps.cast())
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -1,4 +1,5 @@
 package norswap.autumn
+import norswap.autumn.debugger.STNode
 import norswap.autumn.parsers.*
 import norswap.autumn.undoable.UndoList
 import norswap.utils.arrayOfSize
@@ -95,6 +96,9 @@ abstract class Grammar
      * directly.
      */
     val stack  = UndoList<Any?>(this)
+
+    var DEBUG = false
+    val syntax_tree = UndoList<STNode>(this)
 
     /**
      * This datastructure underpins Autumn's built-in support for side effects / parse state. Your

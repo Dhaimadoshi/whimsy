@@ -26,7 +26,8 @@ import norswap.utils.cast
  */
 class Leftrec (g: Grammar, val p: Grammar.(self: Parser) -> Boolean): Parser()
 {
-    init { grammar = g }
-    val leftrec = g.leftrec(p.cast()) // okay because all parsers will be of the naive variety
-    override fun invoke() = leftrec()
+    init {
+        grammar = g
+        parser = g.leftrec(p.cast()) // okay because all parsers will be of the naive variety
+    }
 }

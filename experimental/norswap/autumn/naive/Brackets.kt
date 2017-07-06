@@ -15,7 +15,7 @@ This file contains parsers that match bracketed content and comma-separated cont
  */
 class Brackets (val left: String, val right: String, val p: Parser): Parser()
 {
-    override fun invoke() = grammar.brackets(left, right, p)
+    init { parser = {grammar.brackets(left, right, p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ class Brackets (val left: String, val right: String, val p: Parser): Parser()
  */
 class Angles (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.angles(p)
+    init { parser = {grammar.angles(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ class Angles (val p: Parser): Parser()
  */
 class AnglesEmpty: Parser()
 {
-    override fun invoke() = grammar.angles()
+    init { parser = {grammar.angles()} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ class AnglesEmpty: Parser()
  */
 class Squares (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.squares(p)
+    init { parser = {grammar.squares(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ class Squares (val p: Parser): Parser()
  */
 class SquaresEmpty: Parser()
 {
-    override fun invoke() = grammar.squares()
+    init { parser = {grammar.squares()} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ class SquaresEmpty: Parser()
  */
 class Curlies (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.curlies(p)
+    init { parser = {grammar.curlies(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ class Curlies (val p: Parser): Parser()
  */
 class CurliesEmpty: Parser()
 {
-    override fun invoke() = grammar.curlies()
+    init { parser = {grammar.curlies()} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ class CurliesEmpty: Parser()
  */
 class Parens (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.parens(p)
+    init { parser = {grammar.parens(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ class Parens (val p: Parser): Parser()
  */
 class ParensEmpty: Parser()
 {
-    override fun invoke() = grammar.parens()
+    init { parser = {grammar.parens()} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ class ParensEmpty: Parser()
  */
 class CommaList0 (val item: Parser): Parser()
 {
-    override fun invoke() = grammar.comma_list0(item)
+    init { parser = {grammar.comma_list0(item)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ class CommaList0 (val item: Parser): Parser()
  */
 class CommaList1 (val item: Parser): Parser()
 {
-    override fun invoke() = grammar.comma_list1(item)
+    init { parser = {grammar.comma_list1(item)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ class CommaList1 (val item: Parser): Parser()
  */
 class CommaListTerm0 (val item: Parser): Parser()
 {
-    override fun invoke() = grammar.comma_list_term0(item)
+    init { parser = {grammar.comma_list_term0(item)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ class CommaListTerm0 (val item: Parser): Parser()
  */
 class CommaListTerm1 (val item: Parser): Parser()
 {
-    override fun invoke() = grammar.comma_list1(item)
+    init { parser = {grammar.comma_list1(item)} }
 }
 
 // -------------------------------------------------------------------------------------------------

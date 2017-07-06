@@ -9,10 +9,6 @@ import norswap.autumn.Parser as PlainParser
  * After all parsers have been defined, the grammar will set the [parser] field according to [name].
  */
 class ReferenceParser (val name: String): Parser()
-{
-    lateinit var parser: Parser
-    override fun invoke() = parser()
-}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -21,7 +17,7 @@ class ReferenceParser (val name: String): Parser()
  */
 class Token (val token: () -> Boolean): Parser()
 {
-    override fun invoke() = token()
+    init { parser =  token }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -31,10 +27,11 @@ class Token (val token: () -> Boolean): Parser()
  */
 class TokenChoice (g: TokenGrammar, vararg val parsers: Parser): Parser()
 {
-    init { grammar = g }
-    val token_parsers = parsers.map { (it as Token).token }.toTypedArray()
-    val choice = g.token_choice(*token_parsers)
-    override fun invoke() = choice()
+    init {
+        grammar = g
+        val token_parsers = parsers.map { (it as Token).token }.toTypedArray()
+        parser =  g.token_choice(*token_parsers)
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -47,7 +44,7 @@ class TokenChoice (g: TokenGrammar, vararg val parsers: Parser): Parser()
  */
 class Wrap (val f: () -> Boolean): Parser()
 {
-    override fun invoke() = f()
+    init { parser =  f }
 }
 
 // -------------------------------------------------------------------------------------------------

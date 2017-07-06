@@ -25,7 +25,7 @@ class Affect (
         val effect: Grammar.(Array<Any?>) -> Unit)
     : Parser()
 {
-    override fun invoke() = grammar.affect(backlog, syntax, effect)
+    init { parser = {grammar.affect(backlog, syntax, effect)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ class AffectStr (
         val effect: Grammar.(String) -> Unit)
     : Parser()
 {
-    override fun invoke() = grammar.affect_str(syntax, effect)
+    init { parser = {grammar.affect_str(syntax, effect)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class Build (
         val effect: Grammar.(Array<Any?>) -> Any)
     : Parser()
 {
-    override fun invoke() = grammar.build(backlog, syntax, effect)
+    init { parser = {grammar.build(backlog, syntax, effect)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ class BuildStr (
         val value: Grammar.(String) -> Any = {it})
     : Parser()
 {
-    override fun invoke() = grammar.build_str(syntax, value)
+    init { parser = {grammar.build_str(syntax, value)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ class BuildStr (
  */
 class Maybe (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.maybe(p)
+    init { parser = {grammar.maybe(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ class Maybe (val p: Parser): Parser()
  */
 class AsBool (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.as_bool(p)
+    init { parser = {grammar.as_bool(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ class AsBool (val p: Parser): Parser()
  */
 class AsVal (val value: Any?, val p: Parser): Parser()
 {
-    override fun invoke() = grammar.as_val(value, p)
+    init { parser = {grammar.as_val(value, p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ class AsVal (val value: Any?, val p: Parser): Parser()
  */
 class Gobble (val terminator: Parser): Parser()
 {
-    override fun invoke() = grammar.gobble(terminator)
+    init { parser = {grammar.gobble(terminator)} }
 }
 
 // -------------------------------------------------------------------------------------------------

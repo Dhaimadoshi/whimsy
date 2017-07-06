@@ -10,7 +10,7 @@ import norswap.autumn.parsers.*
  */
 class Transact (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.transact(p)
+    init { parser =  {grammar.transact(p)} }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ class Transact (val p: Parser): Parser()
  */
 class IgnoreErrors (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.ignore_errors(p)
+    init { parser =  {grammar.ignore_errors(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ class IgnoreErrors (val p: Parser): Parser()
  */
 class IgnoreErrorsIfSuccessful (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.ignore_errors_if_successful(p)
+    init { parser =  {grammar.ignore_errors_if_successful(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ class IgnoreErrorsIfSuccessful (val p: Parser): Parser()
  */
 class Perform (val f: Grammar.() -> Unit): Parser()
 {
-    override fun invoke() = grammar.perform(f)
+    init { parser =  {grammar.perform(f)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ class Perform (val f: Grammar.() -> Unit): Parser()
  */
 class Log (val str: String): Parser()
 {
-    override fun invoke() = grammar.log(str)
+    init { parser =  {grammar.log(str)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ class Log (val str: String): Parser()
  */
 class Contain (val failure: () -> String, val p: Parser): Parser()
 {
-    override fun invoke() = grammar.contain(failure, p)
+    init { parser =  {grammar.contain(failure, p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ class Contain (val failure: () -> String, val p: Parser): Parser()
  */
 class TransactContain (val failure: () -> String, val p: Parser): Parser()
 {
-    override fun invoke() = grammar.transact_contain(failure, p)
+    init { parser =  {grammar.transact_contain(failure, p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ class TransactContain (val failure: () -> String, val p: Parser): Parser()
  */
 class Catch (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.catch(p)
+    init { parser =  {grammar.catch(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ class Catch (val p: Parser): Parser()
  */
 class CatchContain (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.catch_contain(p)
+    init { parser =  {grammar.catch_contain(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ class CatchContain (val p: Parser): Parser()
  */
 class Inner (val gather: Parser, val refine: (String) -> Boolean): Parser()
 {
-    override fun invoke() = grammar.inner(gather, refine)
+    init { parser =  {grammar.inner(gather, refine)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -125,7 +125,7 @@ class Inner (val gather: Parser, val refine: (String) -> Boolean): Parser()
  */
 class UntilInner (val terminator: Parser, val refine: (String) -> Boolean): Parser()
 {
-    override fun invoke() = grammar.until_inner(terminator, refine )
+    init { parser =  {grammar.until_inner(terminator, refine )} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -143,9 +143,10 @@ class SubGrammar (
         completion: Grammar.(Grammar) -> Unit = { stack.push(it.stack[0]) })
         : Parser()
 {
-    init { grammar = g }
-    val delegate = g.sub_grammar(sub_grammar, completion)
-    override fun invoke() = delegate()
+    init {
+        grammar = g
+        parser =  g.sub_grammar(sub_grammar, completion)
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -8,7 +8,7 @@ import norswap.autumn.parsers.*
  */
 class Seq (vararg val ps: Parser): Parser()
 {
-    override fun invoke() = grammar.seq { ps.all(Parser::invoke) }
+    init { parser = {grammar.seq { ps.all(Parser::invoke) }} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ class Seq (vararg val ps: Parser): Parser()
  */
 class Opt (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.opt(p)
+    init { parser = {grammar.opt(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ class Opt (val p: Parser): Parser()
  */
 class Repeat0 (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.repeat0(p)
+    init { parser = {grammar.repeat0(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ class Repeat0 (val p: Parser): Parser()
  */
 class Repeat1 (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.repeat1(p)
+    init { parser = {grammar.repeat1(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ class Repeat1 (val p: Parser): Parser()
  */
 class Repeat (val n: Int, val p: Parser): Parser()
 {
-    override fun invoke() = grammar.repeat(n, p)
+    init { parser = {grammar.repeat(n, p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class Repeat (val n: Int, val p: Parser): Parser()
  */
 class Around0 (val around: Parser, val inside: Parser): Parser()
 {
-    override fun invoke() = grammar.around0(around, inside)
+    init { parser = {grammar.around0(around, inside)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ class Around0 (val around: Parser, val inside: Parser): Parser()
  */
 class Around1 (val around: Parser, val inside: Parser): Parser()
 {
-    override fun invoke() = grammar.around1(around, inside)
+    init { parser = {grammar.around1(around, inside)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ class Around1 (val around: Parser, val inside: Parser): Parser()
  */
 class ListTerm0 (val around: Parser, val inside: Parser): Parser()
 {
-    override fun invoke() = grammar.list_term0(around, inside)
+    init { parser = {grammar.list_term0(around, inside)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ class ListTerm0 (val around: Parser, val inside: Parser): Parser()
  */
 class ListTerm1 (val around: Parser, val inside: Parser): Parser()
 {
-    override fun invoke() = grammar.list_term1(around, inside)
+    init { parser = {grammar.list_term1(around, inside)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ class ListTerm1 (val around: Parser, val inside: Parser): Parser()
  */
 class Until0 (val repeat: Parser, val terminator: Parser): Parser()
 {
-    override fun invoke() = grammar.until0(repeat, terminator)
+    init { parser = {grammar.until0(repeat, terminator)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -116,7 +116,7 @@ class Until0 (val repeat: Parser, val terminator: Parser): Parser()
  */
 class Until1 (val repeat: Parser, val terminator: Parser): Parser()
 {
-    override fun invoke() = grammar.until1(repeat, terminator)
+    init { parser = {grammar.until1(repeat, terminator)} }
 }
 
 // -------------------------------------------------------------------------------------------------

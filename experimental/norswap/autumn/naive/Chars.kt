@@ -16,7 +16,7 @@ This file contains parsers that match at the character level.
  */
 class CharPred (val pred: (Char) -> Boolean): Parser()
 {
-    override fun invoke() = grammar.char_pred(pred)
+    init { parser = {grammar.char_pred(pred)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ class CharPred (val pred: (Char) -> Boolean): Parser()
  */
 class CharAny: Parser()
 {
-    override fun invoke() = grammar.char_any()
+    init { parser = {grammar.char_any()} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ class CharAny: Parser()
  */
 class CharRange(val start: Char, val end: Char): Parser()
 {
-    override fun invoke() = grammar.char_range(start, end)
+    init { parser = {grammar.char_range(start, end)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ class CharRange(val start: Char, val end: Char): Parser()
 class CharSet (val chars: String): Parser()
 {
     constructor (vararg c: Char): this(String(c))
-    override fun invoke() = grammar.char_set(chars)
+    init { parser = {grammar.char_set(chars)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class CharSet (val chars: String): Parser()
  */
 class Str (val str: String): Parser()
 {
-    override fun invoke() = grammar.string(str)
+    init { parser = {grammar.string(str)} }
 }
 // -------------------------------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ class Str (val str: String): Parser()
  */
 class WordString (val str: String): Parser()
 {
-    override fun invoke() = grammar.word(str)
+    init { parser = {grammar.word(str)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ class WordString (val str: String): Parser()
  */
 class WordParser (val p: Parser): Parser()
 {
-    override fun invoke() = grammar.word(p)
+    init { parser = {grammar.word(p)} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ class WordParser (val p: Parser): Parser()
  */
 class Alpha: Parser()
 {
-    override fun invoke() = grammar.alpha()
+    init { parser = {grammar.alpha()} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ class Alpha: Parser()
  */
 class Alphanum: Parser()
 {
-    override fun invoke() = grammar.alphanum()
+    init { parser = {grammar.alphanum()} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ class Alphanum: Parser()
  */
 class Digit: Parser()
 {
-    override fun invoke() = grammar.digit()
+    init { parser = {grammar.digit()} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ class Digit: Parser()
  */
 class HexDigit: Parser()
 {
-    override fun invoke() = grammar.hex_digit()
+    init { parser = {grammar.hex_digit()} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -127,7 +127,7 @@ class HexDigit: Parser()
  */
 class OctalDigit: Parser()
 {
-    override fun invoke() = grammar.octal_digit()
+    init { parser = {grammar.octal_digit()} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ class OctalDigit: Parser()
  */
 class SpaceChar: Parser()
 {
-    override fun invoke() = grammar.space_char()
+    init { parser = {grammar.space_char()} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ class SpaceChar: Parser()
  */
 class JavaIden: Parser()
 {
-    override fun invoke() = grammar.java_iden()
+    init { parser = {grammar.java_iden()} }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -158,7 +158,7 @@ class JavaIden: Parser()
  */
 class AsciiJavaIden: Parser()
 {
-    override fun invoke() = grammar.ascii_java_iden()
+    init { parser = {grammar.ascii_java_iden()} }
 }
 
 // -------------------------------------------------------------------------------------------------

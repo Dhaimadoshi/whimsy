@@ -68,6 +68,10 @@ fun compile_model (klass_name: String, model: Any): String
 
     b += "class $klass_name: TokenGrammar()\n{"
     b +=   "\n    val Parser.g: Parser get() = apply { grammar = this@$klass_name }"
+    b +=   "\n    fun Parser.d(name: String): Parser {"
+    b +=   "\n     this.rule = name     "
+    b +=   "\n     return this     "
+    b +=   "\n    }"
     b += "\n\n    val refs = ArrayList<ReferenceParser>()"
     b += "\n\n    fun ref (name: String) = ReferenceParser(name).also { refs.add(it) }"
 
@@ -116,7 +120,7 @@ val compiler_top_level = Poly1<Builder, String>().apply {
         b += "    val ${it.name}"
         if (it.attributes.contains(TypeHint))
             b += ": Parser"
-        b += " = $str"
+        b += " = $str.d(\"${it.name}\")"
         b.toString()
     }
 }
@@ -153,7 +157,7 @@ inline fun <reified T: WrapperBuilder>
 
 val model_compiler = Poly1 <ParserBuilder, String>().apply {
 
-    on <ReferenceBuilder> {
+    parser <ReferenceBuilder> {
         "ref(\"${it.str}\")"
     }
 
@@ -290,7 +294,7 @@ val model_compiler = Poly1 <ParserBuilder, String>().apply {
         it.parser_name.snake_to_camel() + "()"
     }
 
-    on <AssocLeftBuilder> {
+    parser <AssocLeftBuilder> {
         val b = StringBuilder()
 
         if (it is AssocLeftBuilder)
