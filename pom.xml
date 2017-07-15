@@ -132,8 +132,8 @@
             <goals> <goal>compile</goal> </goals>
           </execution>
           <execution>
-            <id>test-compile</id>
-            <goals> <goal>test-compile</goal> </goals>
+            <id>debugplugin.test-compile</id>
+            <goals> <goal>debugplugin.test-compile</goal> </goals>
           </execution>
         </executions>
       </plugin>
@@ -177,7 +177,7 @@
         <version>2.19.1</version>
         <configuration>
           <suiteXmlFiles>
-            <suiteXmlFile>test/testng.xml</suiteXmlFile>
+            <suiteXmlFile>debugplugin.test/testng.xml</suiteXmlFile>
           </suiteXmlFiles>
           <testFailureIgnore>true</testFailureIgnore>
         </configuration>
@@ -316,6 +316,12 @@
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm-tree</artifactId>
       <version>5.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>no.tornado</groupId>
+      <artifactId>tornadofx</artifactId>
+      <version>1.7.8</version>
     </dependency>
   </dependencies>
 
