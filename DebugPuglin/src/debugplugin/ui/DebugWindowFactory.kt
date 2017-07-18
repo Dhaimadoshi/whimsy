@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
+import debugplugin.ui.Views.MasterView
 import javafx.application.Platform
 import javafx.embed.swing.JFXPanel
 import javafx.scene.Scene
@@ -17,7 +18,6 @@ import tornadofx.View
 import tornadofx.action
 
 class DebugWindowFactory : ToolWindowFactory {
-    lateinit var button: Button;
     lateinit var debug_window: ToolWindow
 
     fun DebugWindowFactory() {
@@ -45,7 +45,7 @@ class DebugWindowFactory : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         debug_window = toolWindow
         val fxPanel = JFXPanel()
-        button = Button()
+//        button = Button()
 //        val component = toolWindow.component
 
         Platform.setImplicitExit(false)
@@ -68,7 +68,7 @@ class DebugWindowFactory : ToolWindowFactory {
 //        val menuFile = javafx.scene.control.Menu("file")
 //        menuBar.getMenus().addAll(menuFile)
 //
-        button.action {
+//        button.action {
 //
 //            Model.instance.simple_action
 //                    .actionPerformed(AnActionEvent.createFromAnAction(
@@ -77,8 +77,8 @@ class DebugWindowFactory : ToolWindowFactory {
 //                    ActionPlaces.UNKNOWN,
 //                    DataManager.getInstance().getDataContext())
 //            )
-        }
-        pane.top = button
+//        }
+//        pane.top = button
         pane.center = view.root
         return Scene(pane, 300.0, 250.0)
     }

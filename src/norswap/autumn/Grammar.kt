@@ -1,5 +1,4 @@
 package norswap.autumn
-import norswap.autumn.debugger.DebugNode
 import norswap.autumn.model.STNode
 import norswap.autumn.parsers.*
 import norswap.autumn.undoable.UndoList

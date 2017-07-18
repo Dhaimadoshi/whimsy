@@ -1,61 +1,38 @@
 package norswap.autumn.debugger
 
-import com.intellij.util.containers.Stack
 import norswap.autumn.*
 import norswap.autumn.model.STNode
 import norswap.autumn.naive.Parser
+import norswap.lang.java8.GraphGrammar
+import org.testng.internal.Graph
 
 // todo : transform en fun
-class DebugNode(val grammar: Grammar, val parser_node: Parser)
+fun debugNode(grammar: Grammar, parser_node: Parser): Boolean
 {
-    var called = false
-    var callable = false
     val node = STNode(parser_node, grammar.log.size, grammar.pos)
-            .apply {
-//                DebugAction.syntax_tree.push(this) }
-                grammar.syntax_tree.push(this) }
 
-    operator fun invoke(): Boolean {
-        // push sur stack etat + info parser
-        // a posteriori je peux check back
-        val result = parser_node.parser()
-        node.pos = grammar.pos
-        return result
-    }
-
-    constructor(g: Grammar): this(g, g.root!!)
-
-    fun parse_debug() {
-
-    }
-
-    fun debug() {
-        DebugAction.pre_parse(this)     // logique de debugger avant exec du parser
-
-        val continuation: ()-> Boolean = {
-//            if (!called) { parser(); called = true }
-            val result = parser_node()
-            DebugAction.post_parse(this)    // logique de debuger apres exec du parser
-            result
+    // syntax tree will be empty only when parsing root
+    if(parser_node.rule != "root")
+        try {
+            grammar.syntax_tree.peek().also {
+                it.addChild(node)
+            }
+        }
+        catch (e: Exception) {
+            println("Syntax tree is not supposed to be empty, \nrule requesting :\n$node")
         }
 
-        if ( callable ) continuation()
-        else DebugAction.pendingCall = continuation
-    }
-}
+    grammar.syntax_tree.push(node)
 
-object DebugAction {
-    var pre_parse: ArrayList<(debug: DebugNode)-> Unit> = arrayListOf()
-    var post_parse: ArrayList<(debug: DebugNode)-> Unit> = arrayListOf()
-    lateinit var pendingCall: ()->Boolean
+    val result = parser_node.parser()
 
-    fun pre_parse(debug: DebugNode) { pre_parse.forEach { it(debug) } }
-    fun post_parse(debug: DebugNode) { post_parse.forEach { it(debug) } }
+    if (!result) node.backtracked = true
 
-    fun clear() {
-        pre_parse.clear()
-        post_parse.clear()
-    }
+    if(grammar.syntax_tree.size > 1)
+        grammar.syntax_tree.pop()
+
+    node.pos = grammar.pos
+    return result
 }
 
 /*
@@ -108,15 +85,4 @@ fun Grammar.debug (allow_prefix: Boolean, parser: Parser): Boolean
 }
 
 fun Grammar.debug(): Boolean = debug(false, root!!)
-
-fun Grammar.incremental_undo(): STNode {
-    val node = syntax_tree.peek()
-    pos = node.pos
-
-    while (log.size > node.log_size) {
-        val side_effect = log.removeAt(log.lastIndex)
-        node.side_effects.push(side_effect)
-        side_effect.undo(this)
-    }
-    return node
-}
+//(this as GraphGrammar).dummy)//

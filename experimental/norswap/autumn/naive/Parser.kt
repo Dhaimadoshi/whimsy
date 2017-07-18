@@ -1,6 +1,6 @@
 package norswap.autumn.naive
 import norswap.autumn.Grammar
-import norswap.autumn.debugger.DebugNode
+import norswap.autumn.debugger.debugNode
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.starProjectedType
 import kotlin.reflect.jvm.javaType
@@ -9,12 +9,12 @@ abstract class Parser : () -> Boolean
 {
     lateinit var grammar: Grammar
     lateinit var parser: ()-> Boolean
-    var rule: String? = null
-    val type = this.javaClass.simpleName
+    var rule = ""
+    val type = this.javaClass.simpleName!! // this is always a class
 
     override fun invoke(): Boolean {
         if(grammar.DEBUG)
-            return DebugNode(grammar, this)()
+            return debugNode(grammar, this)
         else
             return parser()
     }

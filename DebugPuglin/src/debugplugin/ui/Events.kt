@@ -8,32 +8,23 @@ import tornadofx.Controller
 import tornadofx.EventBus.RunOn.*
 import tornadofx.FXEvent
 
-object SyntaxTreeRequest : FXEvent(BackgroundThread)
+object SyntaxTableRequest : FXEvent(BackgroundThread)
+object SyntaxTreeRequest : FXEvent()
 
-class SyntaxTreeEvent(val syntax_tree: List<STNode>) : FXEvent()
-
-object STNodeRequest : FXEvent(BackgroundThread)
-
-class STNodeEvent(val node: STNode) : FXEvent()
-
-class UndoEvent(val node: STNode) : FXEvent()
-
-object RedoEvent : FXEvent()
-
-object NoSuchRule : FXEvent()
+class SyntaxTableEvent(val syntax_tree: List<STNode>) : FXEvent()
+class SyntaxTreeEvent(val node: STNode) : FXEvent()
 
 class RuleRequest(val rule: String) : FXEvent()
-
 class RuleEvent(val code: String) : FXEvent()
 
+class MatchedInputRequest(val node: STNode) : FXEvent()
 class MatchedInputEvent(val input: String) : FXEvent()
 
-class MatchedInputRequest(val node: STNode) : FXEvent()
-
 class SetFilterEvent(val filter: Boolean) : FXEvent()
-
 object ResetFilter : FXEvent()
 
 object RemoveNotMatched : FXEvent()
+object RemoveBacktracked : FXEvent()
 
-object BreakpointEvent : FXEvent()
+class SetRootRequest(val selectedItem: STNode?) : FXEvent()
+class AddRootRequest(val items: ArrayList<STNode>) :FXEvent()
