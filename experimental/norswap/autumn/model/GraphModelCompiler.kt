@@ -33,6 +33,11 @@ fun main (args: Array<String>)
  */
 var top_level = true
 
+/**
+ * Parsers with these names are overrides from `Grammar`.
+ */
+val overrides = listOf("root")
+
 // -------------------------------------------------------------------------------------------------
 
 fun set_refs (grammar: Grammar, refs: List<ReferenceParser>)
@@ -117,6 +122,10 @@ val compiler_top_level = Poly1<Builder, String>().apply {
         top_level = true
         val str = model_compiler(it)
         val b = StringBuilder()
+
+        if (overrides.contains(it.name))
+            b += "    override "
+
         b += "    val ${it.name}"
         if (it.attributes.contains(TypeHint))
             b += ": Parser"

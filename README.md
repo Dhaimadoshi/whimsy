@@ -110,7 +110,7 @@ Download the [latest release] `kotlin-fatjar` and add it on your project's class
 The release bundles Whimsy's only dependency: the [Apache BCEL] library, but renames its packages to
 avoid any possibility of conflict.
 
-The fatjar also includes test fixtures to help you build your own tests. Those depend on the
+The fatjar also includes debugplugin.test fixtures to help you build your own tests. Those depend on the
 TestNG library (built with version 6.11 but should be more broadly compatible), which is **not**
 bundled in.
 

@@ -1,5 +1,6 @@
 package norswap.autumn
-import norswap.autumn.debugger.STNode
+import norswap.autumn.debugger.DebugNode
+import norswap.autumn.model.STNode
 import norswap.autumn.parsers.*
 import norswap.autumn.undoable.UndoList
 import norswap.utils.arrayOfSize
@@ -98,6 +99,7 @@ abstract class Grammar
     val stack  = UndoList<Any?>(this)
 
     var DEBUG = false
+//    lateinit var debug_root: DebugNode
     val syntax_tree = UndoList<STNode>(this)
 
     /**
@@ -106,6 +108,13 @@ abstract class Grammar
      * go.
      */
     val log = ArrayList<AppliedSideEffect>()
+
+    fun set_input(input: ParseInput) {
+        this.input = input
+        text = input.text
+    }
+
+    fun setInput(input: String) = set_input(ParseInput(input))
 
     // =============================================================================================
     // Issue/Failure Handling
@@ -178,6 +187,7 @@ abstract class Grammar
      * The root parser for this grammar, which will be invoked by [parse].
      */
     abstract fun root(): Boolean
+    open val root: norswap.autumn.naive.Parser? = null
 
     // ---------------------------------------------------------------------------------------------
 
